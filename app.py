@@ -1,4 +1,3 @@
-# SCREENSHOTONE_API_KEY = "NFHVq-b8iZnSrg"
 from flask import Flask, request, jsonify
 import requests
 import os
@@ -8,12 +7,14 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-
 # API Bilgileri
 SCREENSHOTONE_API_KEY = "NFHVq-b8iZnSrg"
 CLIENT_ID = "59a18efd50a05e8"
 SCREENSHOT_FOLDER = "/tmp/screenshots"
-os.makedirs(SCREENSHOT_FOLDER, exist_ok=True)  # Klasör oluştur
+
+# Render'da geçici klasörü oluştur
+if not os.path.exists(SCREENSHOT_FOLDER):
+    os.makedirs(SCREENSHOT_FOLDER, exist_ok=True)
 
 def take_screenshot(ticker):
     """ScreenshotOne kullanarak ekran görüntüsü alır."""
@@ -58,7 +59,7 @@ def screenshot():
         return jsonify({"error": "Ekran görüntüsü alınamadı"}), 500
 
     imgur_url = upload_to_imgur(screenshot_path)
-    os.remove(screenshot_path)  # Dosyayı sil
+    os.remove(screenshot_path)  # Dosyayı temizle
 
     if imgur_url:
         return jsonify({"message": "Başarılı", "imgur_url": imgur_url}), 200
@@ -66,4 +67,4 @@ def screenshot():
         return jsonify({"error": "Imgur yükleme başarısız"}), 500
 
 if __name__ == '__main__':
-    app.run(port=8080, debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), debug=True)
