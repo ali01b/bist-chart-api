@@ -19,7 +19,7 @@ def take_screenshot(ticker):
     """ScreenshotOne kullanarak ekran görüntüsü alır."""
     screenshot_url = (
         f"https://api.screenshotone.com/take?wait_for_selector=canvas&access_key={SCREENSHOTONE_API_KEY}"
-        f"&url=https://chart-index.vercel.app/chart?ticker={ticker}&full_page=true&format=png"
+        f"&url=https://bist-chart-app.onrender.com/chart?ticker={ticker}&full_page=true&format=png"
     )
 
     response = requests.get(screenshot_url, stream=True)
