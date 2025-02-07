@@ -10,7 +10,7 @@ CORS(app)
 # API Bilgileri
 SCREENSHOTONE_API_KEY = "NFHVq-b8iZnSrg"
 CLIENT_ID = "59a18efd50a05e8"
-SCREENSHOT_FOLDER = "/tmp/screenshots"
+SCREENSHOT_FOLDER = "screenshots"
 
 # Render'da geçici klasörü oluştur
 if not os.path.exists(SCREENSHOT_FOLDER):
