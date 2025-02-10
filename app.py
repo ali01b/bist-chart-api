@@ -8,8 +8,8 @@ app = Flask(__name__)
 CORS(app)
 
 # API Bilgileri
-SCREENSHOTONE_API_KEY = "NFHVq-b8iZnSrg"
-CLIENT_ID = "59a18efd50a05e8"
+SCREENSHOTONE_API_KEY = "UQts1ydrVN9AHg"
+CLIENT_ID = "V9XeKtcBpTw2oQ"
 SCREENSHOT_FOLDER = "screenshots"
 
 # Render'da geçici klasörü oluştur
