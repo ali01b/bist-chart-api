@@ -9,7 +9,7 @@ CORS(app)
 
 # API Bilgileri
 SCREENSHOTONE_API_KEY = "UQts1ydrVN9AHg"
-CLIENT_ID = "V9XeKtcBpTw2oQ"
+CLIENT_ID = "5614fe898f24ff0"
 SCREENSHOT_FOLDER = "screenshots"
 
 # Render'da geçici klasörü oluştur
@@ -49,22 +49,26 @@ def upload_to_imgur(image_path):
 @app.route("/", methods=["GET"])
 def screenshot():
     """URL'nin ekran görüntüsünü alır, Imgur'a yükler ve JSON döndürür."""
-    ticker = request.args.get("ticker")  # GET parametre olarak al
+    try:
+        ticker = request.args.get("ticker")  # GET parametre olarak al
 
-    if not ticker:
-        return jsonify({"error": "ticker belirtilmedi"}), 400
+        if not ticker:
+            return jsonify({"error": "ticker belirtilmedi"}), 400
 
-    screenshot_path = take_screenshot(ticker)
-    if not screenshot_path:
-        return jsonify({"error": "Ekran görüntüsü alınamadı"}), 500
+        screenshot_path = take_screenshot(ticker)
+        if not screenshot_path or not isinstance(screenshot_path, str):
+            return jsonify({"error": "Ekran görüntüsü alınamadı"}), 500
 
-    imgur_url = upload_to_imgur(screenshot_path)
-    os.remove(screenshot_path)  # Dosyayı temizle
+        imgur_url = upload_to_imgur(screenshot_path)
+        print(imgur_url)
 
-    if imgur_url:
-        return jsonify({"message": "Başarılı", "imgur_url": imgur_url}), 200
-    else:
-        return jsonify({"error": "Imgur yükleme başarısız"}), 500
+        if imgur_url:
+            return jsonify({"message": "Başarılı", "imgur_url": imgur_url}), 200
+        else:
+            return jsonify({"error": "Imgur yükleme başarısız"}), 500
+    
+    except Exception as e:
+        return jsonify({"error": "Bir hata oluştu", "detail": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), debug=True)
