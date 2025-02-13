@@ -11,12 +11,11 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-SCREENSHOT_FOLDER = "/tmp/screenshots"
+SCREENSHOT_FOLDER = "screenshots"
 CLIENT_ID = "5614fe898f24ff0"  # Imgur Client ID
 
 # Chrome ve ChromeDriver'ın yolları (Render için elle belirtiyoruz)
-CHROME_PATH = "/usr/bin/google-chrome-stable"
-CHROMEDRIVER_PATH = "/usr/bin/chromedriver"
+CHROMEDRIVER_PATH = "chromedriver"
 
 # Render'da geçici klasörü oluştur
 os.makedirs(SCREENSHOT_FOLDER, exist_ok=True)
@@ -27,7 +26,6 @@ def take_screenshot_selenium(ticker):
 
     # Chrome Seçenekleri
     chrome_options = Options()
-    chrome_options.binary_location = CHROME_PATH  # Elle Chrome'un yerini belirtiyoruz
     chrome_options.add_argument("--headless")  
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
