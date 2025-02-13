@@ -1,19 +1,18 @@
 #!/bin/bash
 
-# Google Chrome'u indir ve yükle
-echo "Google Chrome yükleniyor..."
-curl -O https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-apt update && apt install -y ./google-chrome-stable_current_amd64.deb
-rm google-chrome-stable_current_amd64.deb
+# Headless Chromium ve ChromeDriver'ı indireceğimiz dizini belirleyelim
+mkdir -p /opt/chrome
+mkdir -p /opt/chromedriver
+
+# Headless Chromium'u indir ve yükle
+echo "Headless Chromium yükleniyor..."
+wget -qO- https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.94/linux64/chrome-linux64.zip | bsdtar -xf - -C /opt/chrome
+chmod +x /opt/chrome/chrome-linux64/chrome
 
 # ChromeDriver'ı indir ve yükle
 echo "ChromeDriver yükleniyor..."
-CHROMEDRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)
-wget -N https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
-unzip chromedriver_linux64.zip
-chmod +x chromedriver
-mv chromedriver /opt/chromedriver  # ChromeDriver'ı /opt dizinine taşıyoruz
-rm chromedriver_linux64.zip
+wget -qO- https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.94/linux64/chromedriver-linux64.zip | bsdtar -xf - -C /opt/chromedriver
+chmod +x /opt/chromedriver/chromedriver-linux64/chromedriver
 
 # Python bağımlılıklarını yükle
 pip install -r requirements.txt

@@ -15,7 +15,8 @@ SCREENSHOT_FOLDER = "screenshots"
 CLIENT_ID = "5614fe898f24ff0"  # Imgur Client ID
 
 # Chrome ve ChromeDriver'ın yolları (Render için elle belirtiyoruz)
-CHROMEDRIVER_PATH = "chromedriver"
+CHROME_BINARY_PATH = "/opt/chrome/chrome-linux64/chrome"
+CHROMEDRIVER_PATH = "/opt/chromedriver/chromedriver-linux64/chromedriver"
 
 # Render'da geçici klasörü oluştur
 os.makedirs(SCREENSHOT_FOLDER, exist_ok=True)
@@ -26,6 +27,7 @@ def take_screenshot_selenium(ticker):
 
     # Chrome Seçenekleri
     chrome_options = Options()
+    chrome_options.binary_location = CHROME_BINARY_PATH  # Headless Chromium'un yolunu belirtiyoruz
     chrome_options.add_argument("--headless")  
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
