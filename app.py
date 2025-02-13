@@ -15,8 +15,8 @@ SCREENSHOT_FOLDER = "screenshots"
 CLIENT_ID = "5614fe898f24ff0"  # Imgur Client ID
 
 # Chrome ve ChromeDriver'ın yolları (Render için elle belirtiyoruz)
-CHROME_BINARY_PATH = "/opt/chrome/chrome-linux64/chrome"
-CHROMEDRIVER_PATH = "/opt/chromedriver/chromedriver-linux64/chromedriver"
+CHROME_BINARY_PATH = "/tmp/chrome/chrome-linux64/chrome"
+CHROMEDRIVER_PATH = "/tmp/chromedriver/chromedriver-linux64/chromedriver"
 
 # Render'da geçici klasörü oluştur
 os.makedirs(SCREENSHOT_FOLDER, exist_ok=True)
