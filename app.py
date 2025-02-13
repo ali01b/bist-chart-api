@@ -1,37 +1,57 @@
 from flask import Flask, request, jsonify
-import requests
 import os
 import time
+import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
 
-# API Bilgileri
-SCREENSHOTONE_API_KEY = "UQts1ydrVN9AHg"
-CLIENT_ID = "5614fe898f24ff0"
 SCREENSHOT_FOLDER = "screenshots"
+CLIENT_ID = "5614fe898f24ff0"  # Imgur Client ID
 
 # Render'da geçici klasörü oluştur
-if not os.path.exists(SCREENSHOT_FOLDER):
-    os.makedirs(SCREENSHOT_FOLDER, exist_ok=True)
+os.makedirs(SCREENSHOT_FOLDER, exist_ok=True)
 
-def take_screenshot(ticker):
-    """ScreenshotOne kullanarak ekran görüntüsü alır."""
-    screenshot_url = (
-        f"https://api.screenshotone.com/take?wait_for_selector=canvas&access_key={SCREENSHOTONE_API_KEY}"
-        f"&url=https://bist-chart-app.onrender.com/chart?ticker={ticker}&full_page=true&format=png"
-    )
+def take_screenshot_selenium(ticker):
+    """Selenium ile ekran görüntüsü alır."""
+    url = f"https://bist-chart-app.onrender.com/chart?ticker={ticker}"
 
-    response = requests.get(screenshot_url, stream=True)
-    if response.status_code == 200:
+    # Chrome Seçenekleri
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
+
+    # WebDriver Başlat
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+
+    try:
+        driver.get(url)
+        time.sleep(3)  # Sayfanın yüklenmesini bekle
+        
+        # Canvas elementinin yüklenmesini bekle
+        driver.find_element(By.TAG_NAME, "canvas")
+
+        # Screenshot kaydet
         filename = f"{int(time.time())}.png"
         filepath = os.path.join(SCREENSHOT_FOLDER, filename)
-        with open(filepath, "wb") as file:
-            for chunk in response.iter_content(1024):
-                file.write(chunk)
-        return filepath
-    return None
+        driver.save_screenshot(filepath)
+    except Exception as e:
+        print(f"Hata: {e}")
+        filepath = None
+    finally:
+        driver.quit()
+
+    return filepath
 
 def upload_to_imgur(image_path):
     """Resmi Imgur'a yükler ve URL'yi döndürür."""
@@ -48,27 +68,22 @@ def upload_to_imgur(image_path):
 
 @app.route("/", methods=["GET"])
 def screenshot():
-    """URL'nin ekran görüntüsünü alır, Imgur'a yükler ve JSON döndürür."""
-    try:
-        ticker = request.args.get("ticker")  # GET parametre olarak al
+    """Selenium ile ekran görüntüsü alır, Imgur'a yükler ve JSON döndürür."""
+    ticker = request.args.get("ticker")
+    if not ticker:
+        return jsonify({"error": "ticker belirtilmedi"}), 400
 
-        if not ticker:
-            return jsonify({"error": "ticker belirtilmedi"}), 400
+    screenshot_path = take_screenshot_selenium(ticker)
+    if not screenshot_path:
+        return jsonify({"error": "Ekran görüntüsü alınamadı"}), 500
 
-        screenshot_path = take_screenshot(ticker)
-        if not screenshot_path or not isinstance(screenshot_path, str):
-            return jsonify({"error": "Ekran görüntüsü alınamadı"}), 500
+    imgur_url = upload_to_imgur(screenshot_path)
+    os.remove(screenshot_path)  # Dosyayı temizle
 
-        imgur_url = upload_to_imgur(screenshot_path)
-        print(imgur_url)
-
-        if imgur_url:
-            return jsonify({"message": "Başarılı", "imgur_url": imgur_url}), 200
-        else:
-            return jsonify({"error": "Imgur yükleme başarısız"}), 500
-    
-    except Exception as e:
-        return jsonify({"error": "Bir hata oluştu", "detail": str(e)}), 500
+    if imgur_url:
+        return jsonify({"message": "Başarılı", "imgur_url": imgur_url}), 200
+    else:
+        return jsonify({"error": "Imgur yükleme başarısız"}), 500
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), debug=True)
