@@ -6,6 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -14,20 +15,22 @@ CORS(app)
 SCREENSHOT_FOLDER = "screenshots"
 CLIENT_ID = "5614fe898f24ff0"  # Imgur Client ID
 
-# Chrome ve ChromeDriver'ın yolları (Render için elle belirtiyoruz)
-CHROME_BINARY_PATH = "/tmp/chrome/chrome-linux64/chrome"
-CHROMEDRIVER_PATH = "/tmp/chromedriver/chromedriver-linux64/chromedriver"
+# # Chrome ve ChromeDriver'ın yolları (Render için elle belirtiyoruz)
+# CHROME_BINARY_PATH = "/tmp/chrome/chrome-linux64/chrome"
+# CHROMEDRIVER_PATH = "/tmp/chromedriver/chromedriver-linux64/chromedriver"
 
 # Render'da geçici klasörü oluştur
 os.makedirs(SCREENSHOT_FOLDER, exist_ok=True)
 
 def take_screenshot_selenium(ticker):
     """Selenium ile ekran görüntüsü alır."""
+    
+    # chrome_bin = os.environ.get("CHROME_BIN", "/code/chrome/chrome-linux64/chrome")
+    # chromedriver_path = os.environ.get("CHROMEDRIVER_PATH", "/code/chromedriver/chromedriver-linux64/chromedriver")
     url = f"https://bist-chart-app.onrender.com/chart?ticker={ticker}"
 
     # Chrome Seçenekleri
     chrome_options = Options()
-    chrome_options.binary_location = CHROME_BINARY_PATH  # Headless Chromium'un yolunu belirtiyoruz
     chrome_options.add_argument("--headless")  
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
@@ -35,8 +38,7 @@ def take_screenshot_selenium(ticker):
     chrome_options.add_argument("--window-size=1920,1080")
 
     # WebDriver Başlat
-    service = Service(CHROMEDRIVER_PATH)  # ChromeDriver'ı elle belirtiyoruz
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
     try:
         driver.get(url)
