@@ -6,7 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
+
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -38,7 +38,8 @@ def take_screenshot_selenium(ticker):
     chrome_options.add_argument("--window-size=1920,1080")
 
     # WebDriver Başlat
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    service = Service("/usr/bin/chromedriver")
+    driver = webdriver.Chrome(service=service, options=chrome_options)
 
     try:
         driver.get(url)
