@@ -38,7 +38,7 @@ def take_screenshot_selenium(ticker):
     chrome_options.add_argument("--window-size=1920,1080")
 
     # WebDriver Başlat
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager(driver_version="latest").install()), options=chrome_options)
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
     try:
         driver.get(url)
