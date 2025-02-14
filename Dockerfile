@@ -1,11 +1,8 @@
 FROM python:3.10-slim
 
-# Chrome için gerekli bağımlılıkları yükle
+# Chrome ve driver yükle
 RUN apt-get update && apt-get install -y \
-    wget unzip curl gnupg \
     chromium chromium-driver \
-    libnss3 libxss1 libappindicator3-1 \
-    fonts-liberation \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
