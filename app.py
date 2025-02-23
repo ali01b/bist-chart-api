@@ -22,13 +22,17 @@ CLIENT_ID = "5614fe898f24ff0"  # Imgur Client ID
 # Render'da geçici klasörü oluştur
 os.makedirs(SCREENSHOT_FOLDER, exist_ok=True)
 
-def take_screenshot_selenium(ticker):
+def take_screenshot_selenium(ticker, type):
     """Selenium ile ekran görüntüsü alır."""
     
     # chrome_bin = os.environ.get("CHROME_BIN", "/code/chrome/chrome-linux64/chrome")
     # chromedriver_path = os.environ.get("CHROMEDRIVER_PATH", "/code/chromedriver/chromedriver-linux64/chromedriver")
-    url = f"https://bist-chart-app.onrender.com/chart?ticker={ticker}"
 
+    if type == "erol":
+        url = f"https://bist-chart-app.onrender.com/charts/main?ticker={ticker}"
+    else:
+        url = f"https://bist-chart-app.onrender.com/charts/erolatasoy?ticker={ticker}"
+        
     # Chrome Seçenekleri
     chrome_options = Options()
     chrome_options.add_argument("--headless")  
@@ -77,10 +81,11 @@ def upload_to_imgur(image_path):
 def screenshot():
     """Selenium ile ekran görüntüsü alır, Imgur'a yükler ve JSON döndürür."""
     ticker = request.args.get("ticker")
+    types  = request.args.get("type")
     if not ticker:
         return jsonify({"error": "ticker belirtilmedi"}), 400
 
-    screenshot_path = take_screenshot_selenium(ticker)
+    screenshot_path = take_screenshot_selenium(ticker, type=types)
     if not screenshot_path:
         return jsonify({"error": "Ekran görüntüsü alınamadı"}), 500
 
